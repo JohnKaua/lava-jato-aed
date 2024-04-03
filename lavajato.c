@@ -1,52 +1,98 @@
-typedef struct Fila{
-    int ini, fim, tam_atual;
-    unsigned tam;
-    int* array;
-}Fila;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-Fila* criarFila(unsigned tam){
-    Fila* fila = (Fila*)malloc(sizeof(Fila));
-    fila->tam = tam;
-    fila->ini = fila->tam = 0;
-    fila->fim = tam - 1;
-    fila->array = (int*) malloc(fila->tam * sizeof(int));
+typedef struct {
+    int ini, fim, tamanho;
+    unsigned capacidade;
+    int* array;
+} Fila;
+
+Fila* criarFila(unsigned capacidade) {
+    Fila* fila = (Fila*) malloc(sizeof(Fila));
+    fila->capacidade = capacidade;
+    fila->ini = fila->tamanho = 0; 
+    fila->fim = capacidade - 1;
+    fila->array = (int*) malloc(fila->capacidade * sizeof(int));
+    memset(fila->array, 0, fila->capacidade * sizeof(int));
     return fila;
 }
 
-int isCheia(Fila* fila){
-    return(fila->tam_atual == fila->tam);
+int estaCheia(Fila* fila) {
+    return (fila->tamanho == fila->capacidade);
 }
 
-int isVazia(Fila* fila){
-    return(fila->tam_atual == 0);
+int estaVazia(Fila* fila) {
+    return (fila->tamanho == 0);
 }
 
-void insercaoFila(Fila* fila, int x){
-    if(!isCheia(fila)){
-        fila->fim = (fila->fim + 1) % fila->tam;
-        fila->array[fila->fim] = x;
-        fila->tam_atual = fila->tam_atual + 1;
-    } else printf("overflow");
+void enfileirar(Fila* fila, int item) {
+    if (estaCheia(fila))
+        return;
+    fila->fim = (fila->fim + 1) % fila->capacidade;
+    fila->array[fila->fim] = item;
+    fila->tamanho = fila->tamanho + 1;
 }
 
-void remocaoFila(Fila* fila){
-    if(!isVazia(fila)){
-        int x = fila->array[fila->ini];
-        fila->ini = (fila->ini + 1) % fila->tam;
-        fila->tam_atual = fila->tam_atual - 1;
-    } else printf("underflow");
+int desenfileirar(Fila* fila) {
+    if (estaVazia(fila))
+        return -1;
+    int item = fila->array[fila->ini];
+    fila->ini = (fila->ini + 1) % fila->capacidade;
+    fila->tamanho = fila->tamanho - 1;
+    return item;
 }
 
-int main(){
+int main() {
     int n, k;
-    int* V;
+    char* V;
 
-    printf("Quantidade de minutos: ");
-    scanf("%d", &n);
-    printf("Capacidade do lavajato: ");
-    scanf("%d", &k);
+    // Recebe os valores de n e k
+    printf("Digite o valor de n e k: ");
+    scanf("%d %d", &n, &k);
 
-    V = (int*) malloc(n * sizeof(int));
-    scanf("%d", V);
-    printf("%d", V);
+    // Recebe o vetor binário V
+    V = (char*) malloc((n + 1) * sizeof(char));
+    printf("Digite o vetor binario V: ");
+    scanf("%s", V);
+
+    // Cria a fila
+    Fila* fila = criarFila(k);
+
+    int carrosLavados = 0;
+    int tempoRestante = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (tempoRestante > 0)
+            tempoRestante--;
+
+        if (tempoRestante == 0 && !estaVazia(fila)) {
+            desenfileirar(fila);
+            carrosLavados++;
+        }
+
+        if (V[i] == '1') {
+            if (!estaCheia(fila) && tempoRestante == 0) {
+                enfileirar(fila, 1);
+                tempoRestante = 2;
+            }
+        }
+    }
+
+    // Processa os carros restantes na fila após o último minuto
+    while (!estaVazia(fila) && tempoRestante <= 0) {
+        desenfileirar(fila);
+        carrosLavados++;
+        if (!estaVazia(fila)) {
+            tempoRestante = 2;
+        }
+    }
+
+    printf("Carros lavados: %d\n", carrosLavados);
+
+    free(V);
+    free(fila->array);
+    free(fila);
+
+    return 0;
 }
