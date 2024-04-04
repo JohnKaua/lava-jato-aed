@@ -2,45 +2,67 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
-    int ini, fim, tamanho;
-    unsigned capacidade;
-    int* array;
-} Fila;
+struct No {
+    int info;
+    struct No* prox;
+};
 
-Fila* criarFila(unsigned capacidade) {
-    Fila* fila = (Fila*) malloc(sizeof(Fila));
-    fila->capacidade = capacidade;
-    fila->ini = fila->tamanho = 0; 
-    fila->fim = capacidade - 1;
-    fila->array = (int*) malloc(fila->capacidade * sizeof(int));
-    memset(fila->array, 0, fila->capacidade * sizeof(int));
+struct Fila {
+    struct No *ini, *fim;
+    int tam;
+};
+
+struct No* criarNo(int info){
+    struct No* novo = (struct No*)malloc(sizeof(struct No));
+    novo->info = info;
+    novo->prox = NULL;
+    return novo;
+}
+
+struct Fila* criarFila() {
+    struct Fila* fila = (struct Fila*)malloc(sizeof(struct Fila));
+    fila->ini = fila->fim = NULL;
+    fila->tam = 0;
     return fila;
 }
 
-int estaCheia(Fila* fila) {
-    return (fila->tamanho == fila->capacidade);
+int estaCheia(struct Fila* fila, int k) {
+    if(fila->tam == k)
+        return 1;
+    return 0;
 }
 
-int estaVazia(Fila* fila) {
-    return (fila->tamanho == 0);
+int estaVazia(struct Fila* fila) {
+    if(fila->tam == 0)
+        return 1;
+    return 0;
 }
 
-void enfileirar(Fila* fila, int item) {
-    if (estaCheia(fila))
-        return;
-    fila->fim = (fila->fim + 1) % fila->capacidade;
-    fila->array[fila->fim] = item;
-    fila->tamanho = fila->tamanho + 1;
+void insercaoFila(struct Fila* fila, int info, int k) {
+    if(!estaCheia(fila, k)){
+        struct No* novo = criarNo(info);
+        if(estaVazia(fila)){
+            fila->ini = fila->fim = novo;
+            fila->tam++;
+            return;
+        }
+        fila->fim->prox = novo;
+        fila->fim = novo;
+        fila->tam++;
+    }
 }
 
-int desenfileirar(Fila* fila) {
-    if (estaVazia(fila))
-        return -1;
-    int item = fila->array[fila->ini];
-    fila->ini = (fila->ini + 1) % fila->capacidade;
-    fila->tamanho = fila->tamanho - 1;
-    return item;
+void remocaoFila(struct Fila* fila) {
+    if (!estaVazia(fila)){
+        struct No* no = fila->ini;
+        fila->ini = fila->ini->prox;
+
+        if(fila->ini == NULL)
+            fila->fim = NULL;
+        
+        free(no);
+        fila->tam--;
+    }
 }
 
 int main() {
@@ -57,41 +79,31 @@ int main() {
     scanf("%s", V);
 
     // Cria a fila
-    Fila* fila = criarFila(k);
+    struct Fila* fila = criarFila();
 
-    int carrosLavados = 0;
-    int tempoRestante = 0;
+    int lavados = 0;
+    int tempo = 0;
 
     for (int i = 0; i < n; i++) {
-        if (tempoRestante > 0)
-            tempoRestante--;
+        if (tempo > 0)
+            tempo--;
 
-        if (tempoRestante == 0 && !estaVazia(fila)) {
-            desenfileirar(fila);
-            carrosLavados++;
+        if (tempo == 0 && !estaVazia(fila)) {
+            remocaoFila(fila);
+            lavados++;
         }
 
         if (V[i] == '1') {
-            if (!estaCheia(fila) && tempoRestante == 0) {
-                enfileirar(fila, 1);
-                tempoRestante = 2;
+            if (!estaCheia(fila, k) && tempo == 0) {
+                insercaoFila(fila, 1, k);
+                tempo = 2;
             }
         }
     }
 
-    // Processa os carros restantes na fila após o último minuto
-    while (!estaVazia(fila) && tempoRestante <= 0) {
-        desenfileirar(fila);
-        carrosLavados++;
-        if (!estaVazia(fila)) {
-            tempoRestante = 2;
-        }
-    }
-
-    printf("Carros lavados: %d\n", carrosLavados);
+    printf("Carros lavados: %d\n", lavados);
 
     free(V);
-    free(fila->array);
     free(fila);
 
     return 0;
