@@ -95,14 +95,19 @@ int main() {
         }
 
         // se no minuto i chegar um carro, fila não está cheia e o tempo de lavagem acabou
-        if (V[i] == '1' && !estaCheia(fila, k) && tempo == 0) {
+        if (V[i] == '1' && !estaCheia(fila, k) && tempo == 0){
             insercaoFila(fila, 1, k); // Insere o carro na fila
             tempo = 2;                // Define o tempo de lavagem para 2
+        }
+        if (V[i] == '1' && !estacheia(fila, k) && tempo != 0){
+            insercaoFila(fila, 1, k);
         }
     }
 
     // Imprime a quantidade total de carros lavados
     printf("Carros lavados: %d\n", lavados);
+
+    system("pause");
 
     // Libera a memória alocada para o vetor V e a fila
     free(V);
