@@ -17,7 +17,7 @@ __estaVazia(struct Fila* fila):__ Verifica se a fila está vazia.
 
 __insercaoFila(struct Fila* fila, int info, int k):__ Insere um novo carro na fila, desde que a fila não esteja cheia.
 
-__remocaoFila(struct Fila* fila):__ Remove um carro da fila para lavagem.
+__remocaoFila(struct Fila* fila):__ Remove um carro da fila.
 ## Função Principal (Main)
 Na função main():
 
@@ -27,7 +27,7 @@ Na função main():
 
 3- É inicializada uma fila vazia.
 
-4- É realizada uma iteração sobre os carros representados pelo vetor V, verificando se eles precisam ser lavados e manipulando a fila conforme necessário.
+4- É realizada uma iteração sobre os carros representados pelo vetor V, verificando se no minuto i chegam carros no lava jato ou não e manipulando a fila conforme necessário.
 
 5- É impressa a quantidade total de carros lavados.
 
