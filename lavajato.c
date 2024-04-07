@@ -99,7 +99,7 @@ int main() {
             insercaoFila(fila, 1, k); // Insere o carro na fila
             tempo = 2;                // Define o tempo de lavagem para 2
         }
-        if (V[i] == '1' && !estacheia(fila, k) && tempo != 0){
+        if (V[i] == '1' && !estaCheia(fila, k) && tempo != 0){
             insercaoFila(fila, 1, k);
         }
     }
