@@ -59,7 +59,7 @@ void remocaoFila(struct Fila* fila) { // função para remoção na fila
 
         if(fila->ini == NULL) // se após a remoção início for lambda, o fim também será lambda, pois a fila se tornou vazia
             fila->fim = NULL;
-        
+
         free(no); // liberação de memória do nó removido
         fila->tam--; // tamanho decrementa
     }
@@ -81,12 +81,12 @@ int main() {
     // Cria a fila
     struct Fila* fila = criarFila();
 
-    int lavados = 0; 
-    int tempo = 0;   
+    int lavados = 0;
+    int tempo = 0;
 
     // Loop sobre os carros representados pelo vetor V
     for (int i = 0; i < n; i++) {
-        if (tempo > 0) 
+        if (tempo > 0)
             tempo--;   // Se o tempo de lavagem não é 0, decrementa
 
         if (tempo == 0 && !estaVazia(fila)) { // Se o tempo da lavagem acabou e a fila não está vazia
@@ -94,20 +94,22 @@ int main() {
             lavados++;         // Incrementa o contador de carros lavados
         }
 
+        if (V[i] == '1' && !estaCheia(fila, k)){
+            insercaoFila(fila, 1, k);
+            tempo = 2;
+        }
+
         // se no minuto i chegar um carro, fila não está cheia e o tempo de lavagem acabou
-        if (V[i] == '1' && !estaCheia(fila, k) && tempo == 0){
+        if (V[i] == '1' && !estaVazia(fila) && tempo == 0){
+            remocaoFila(fila);        // remove carro que acabou de ser lavado da fila
+            lavados++;                // lavados incrementa
             insercaoFila(fila, 1, k); // Insere o carro na fila
             tempo = 2;                // Define o tempo de lavagem para 2
-        }
-        if (V[i] == '1' && !estaCheia(fila, k) && tempo != 0){
-            insercaoFila(fila, 1, k);
         }
     }
 
     // Imprime a quantidade total de carros lavados
     printf("Carros lavados: %d\n", lavados);
-
-    system("pause");
 
     // Libera a memória alocada para o vetor V e a fila
     free(V);
